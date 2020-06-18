@@ -1,9 +1,12 @@
 import socket
 import sys
 import getopt
+import binascii
 
 PORT = None
 SERVER = None
+DATAWORDS = ['4500', '0028', '1c46', '4000', '4006', 'c0a8', '0003', 'c0a8', '0001']
+MOD = 1 << 16
 
 argumentList = sys.argv[1:]
 
@@ -52,12 +55,34 @@ def send(msg):
     client.send(message)
 
 
+def ones_comp_add16(num1,num2):
+    result = num1 + num2
+    return result if result < MOD else (result+1) % MOD
+
+
+def generate_checksum(datawords):
+
+    sum = 0x0000
+
+    for i in datawords:
+        sum = ones_comp_add16(sum, int.from_bytes(binascii.unhexlify(i), byteorder="big"))
+
+    sum = hex(sum ^ 0xFFFF) #XOR
+    return sum
+
+
+
 while True:
 
-    msg = input("Please enter message: \n")
-    send(msg)
+    payload = input("Please enter message: \n")
+    packet = int.from_bytes(
+        binascii.unhexlify(''.join(DATAWORDS[0:5]) + generate_checksum(DATAWORDS)[2:] + ''.join(DATAWORDS[5:9]) + payload)
+                            , byteorder="big")
 
-    if msg == DISCONNECT_MSG:
+
+    send(packet)
+
+    if payload == DISCONNECT_MSG:
         break
 
 
