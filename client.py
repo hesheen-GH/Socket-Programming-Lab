@@ -14,7 +14,6 @@ FLAGS_OFFSET = '0x4000'
 TTL_PROTOCOL = '0x4006'
 MOD = 1 << 16
 FORMAT = 'ISO-8859-1'
-FORMAT = 'ASCII'
 DISCONNECT_MSG = "!DISCONNECT"
 #---------------------------
 
