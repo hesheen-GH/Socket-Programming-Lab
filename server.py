@@ -6,15 +6,16 @@ import sys
 
 #server is this DESKTOP
 
+SERVER = socket.gethostbyname(socket.gethostname()) #default
 PORT = 8888 #default
 
 argumentList = sys.argv[1:]
 
 # Options
-options = "p:"
+options = "s:p:"
 
 # Long options
-long_options = ["Port ="]
+long_options = ["Server =", "Port ="]
 
 try:
     # Parsing argument
@@ -23,7 +24,10 @@ try:
     # checking each argument
     for currentArgument, currentValue in arguments:
 
-        if currentArgument in ("-p", "--Port"):
+        if currentArgument in ("-s", "--Server"):
+            SERVER = str(currentValue)
+
+        elif currentArgument in ("-p", "--Port"):
             PORT = int(currentValue)
 
 

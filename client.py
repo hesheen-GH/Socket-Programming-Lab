@@ -5,6 +5,7 @@ import binascii
 
 PORT = None
 SERVER = None
+CLIENT = None
 
 #Constants-----------------
 HEADER_LENGTH = 20
@@ -85,10 +86,10 @@ def add_header_length(total_len):
 argumentList = sys.argv[1:]
 
 # Options
-options = "s:p:"
+options = "s:c:p:"
 
 # Long options
-long_options = ["Server =", "Port ="]
+long_options = ["Server =", "Client =", "Port ="]
 
 try:
     # Parsing argument
@@ -99,6 +100,9 @@ try:
 
         if currentArgument in ("-s", "--Server"):
             SERVER = str(currentValue)
+
+        elif currentArgument in ("-c", "--Client"):
+            CLIENT = str(currentValue)
 
         elif currentArgument in ("-p", "--Port"):
             PORT = int(currentValue)
@@ -126,7 +130,7 @@ while True:
 
     TOTAL_LENGTH = TOTAL_LENGTH + len(PADDING)
 
-    SOURCE_IP, DEST_IP = add_ip_header(socket.gethostbyname(socket.gethostname()), SERVER)
+    SOURCE_IP, DEST_IP = add_ip_header(CLIENT, SERVER)
 
     DATAWORDS = [VERSION[2:], add_header_length(TOTAL_LENGTH), ID_FIELD[2:], FLAGS_OFFSET[2:], TTL_PROTOCOL[2:],
                  SOURCE_IP[0], SOURCE_IP[1], DEST_IP[0], DEST_IP[1]]
