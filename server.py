@@ -3,30 +3,39 @@ import threading
 
 #server is this DESKTOP
 
-HEADER = 64 #bytes
+MAX_PACKET_SIZE = 255 #max possible bytes
+HEADER_LENGTH = 20
 PORT = 8888
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
-FORMAT = 'utf-8'
+FORMAT = 'ISO-8859-1'
 DISCONNECT_MSG = "!DISCONNECT"
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 def handle_client(conn, addr):
+
     print(f"[NEW CONNECTION] {addr} connected. ")
 
     connected = True
     while connected:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
 
-        if msg_length:
-            msg_length = int(msg_length)
-            msg = conn.recv(msg_length).decode(FORMAT)
-            if msg == DISCONNECT_MSG:
+        packet_length = int.from_bytes(conn.recv(MAX_PACKET_SIZE), byteorder='big')
+
+        if packet_length:
+
+            packet = conn.recv(packet_length) #contains packet information in bytes format
+            payload = packet[HEADER_LENGTH:]
+            payload = payload.decode(FORMAT, errors='ignore')
+
+            if payload == DISCONNECT_MSG:
                 connected = False
 
-            print(f"[{addr}] {msg}")
+            print(f"The data recieved from [{addr}] is {payload}")
+            print(f"Total packet length received {packet_length} bytes")
+            print(f"Payload length received {packet_length-20} bytes")
+
             conn.send("Msg recieved".encode(FORMAT))
 
     conn.close()
@@ -39,6 +48,7 @@ def start():
 
     while True:
         conn, addr = server.accept() #when connection occurs store in conn and addr
+
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
