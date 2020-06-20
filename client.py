@@ -43,8 +43,6 @@ def generate_checksum(datawords):
     while len(sum) != 4:
         sum = '0' + sum
 
-    print(sum)
-
     return sum
 
 def add_ip_header(src_ip, dest_ip):
@@ -142,6 +140,7 @@ while True:
 
     packet = int(packet, 16)
     packet = packet.to_bytes(TOTAL_LENGTH, 'big')
+
     send(packet, TOTAL_LENGTH)
 
     if payload == DISCONNECT_MSG:
