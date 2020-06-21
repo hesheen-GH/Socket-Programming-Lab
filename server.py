@@ -85,7 +85,6 @@ def handle_client(conn, addr):
 
             payload = "".join(packet[10:])
             payload = [payload[i:i+2] for i in range(0, len(payload), 2)]
-            print(payload)
 
             for i in payload:
                 message.append(bytes.fromhex(i).decode(FORMAT))
